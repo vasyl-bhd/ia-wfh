@@ -36,6 +36,7 @@
 
 <div>
     <Calendar
+            class="flex flex-col items-center"
             multiple
             onValueChange={d => d && onValueChange(d)}
             isDateDisabled={isDateDisabled}
