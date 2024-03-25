@@ -1,6 +1,6 @@
 {
   "name": "Better WFH",
-  "description": "A browser extension made with Svelte Kit",
+  "description": "A tool for better handling of WFH in central",
   "version": "1.0.0",
   "manifest_version": 3,
   "action": {
