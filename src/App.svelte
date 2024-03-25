@@ -27,11 +27,6 @@
 
             return acc
         }, {} as Record<string, string>)
-
-        // csrftoken
-        // sessionid
-
-
     }
 </script>
 
