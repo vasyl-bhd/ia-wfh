@@ -1,5 +1,5 @@
-<script>
+<script lang="ts">
+    import RangePicker from "$lib/components/RangePicker.svelte";
 </script>
 
-<div class="container">
-</div>
+<RangePicker/>
