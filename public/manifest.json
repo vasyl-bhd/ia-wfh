@@ -1,0 +1,11 @@
+{
+  "name": "Better WFH",
+  "description": "A browser extension made with Svelte Kit",
+  "version": "1.0.0",
+  "manifest_version": 3,
+  "action": {
+    "default_title": "Svelte Extension",
+    "default_icon": "vite.svg",
+    "default_popup": "index.html"
+  }
+}
