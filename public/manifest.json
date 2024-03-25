@@ -4,8 +4,16 @@
   "version": "1.0.0",
   "manifest_version": 3,
   "action": {
-    "default_title": "Svelte Extension",
+    "default_title": "Better WFH",
     "default_icon": "vite.svg",
     "default_popup": "index.html"
-  }
+  },
+  "permissions": [
+    "activeTab",
+    "cookies",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ]
 }
