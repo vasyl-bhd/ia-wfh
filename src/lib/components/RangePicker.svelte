@@ -1,10 +1,11 @@
 <script lang="ts">
     import {CalendarDate, type DateValue, getLocalTimeZone} from "@internationalized/date";
     import {Calendar} from "$lib/components/ui/calendar";
-    import dayjs from "dayjs";
+    import dayjs, {Dayjs} from "dayjs";
     import _ from "lodash";
 
     export let values: DateValue[] = []
+    export let datesToDisable: Dayjs[] = [];
 
     const fillSortedDates = (sortedDates: [DateValue, DateValue]) => {
         const firstDate = dayjs(sortedDates[0].toDate(getLocalTimeZone()))
@@ -18,11 +19,10 @@
     }
 
     const isDateDisabled = (date: DateValue) => {
-        return date.day % 3 === 0
+        return datesToDisable.find(d => d.isSame(date.toDate(getLocalTimeZone()), 'dates')) !== undefined
     }
 
     const onValueChange = (dates: DateValue[]) => {
-        console.log(dates)
         const sortedDates = dates.sort((d1, d2) => d1.compare(d2))
 
         if (sortedDates.length === 2) {
@@ -34,7 +34,7 @@
     }
 </script>
 
-<div >
+<div>
     <Calendar
             multiple
             onValueChange={d => d && onValueChange(d)}
