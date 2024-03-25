@@ -4,8 +4,7 @@
     import dayjs from "dayjs";
     import _ from "lodash";
 
-    $: values = []
-
+    export let values: DateValue[] = []
 
     const fillSortedDates = (sortedDates: [DateValue, DateValue]) => {
         const firstDate = dayjs(sortedDates[0].toDate(getLocalTimeZone()))
@@ -23,28 +22,24 @@
     }
 
     const onValueChange = (dates: DateValue[]) => {
+        console.log(dates)
         const sortedDates = dates.sort((d1, d2) => d1.compare(d2))
 
-        console.log(values, dates)
         if (sortedDates.length === 2) {
             const filledDates = fillSortedDates([sortedDates[0], sortedDates[1]])
             values = filledDates.map(d => new CalendarDate(d.year(), d.month() + 1, d.date())).filter(d => !isDateDisabled(d))
-            console.log(values)
         } else {
             values = _.difference(dates, values)
         }
     }
 </script>
 
-<div class="container">
+<div >
     <Calendar
             multiple
             onValueChange={d => d && onValueChange(d)}
             isDateDisabled={isDateDisabled}
             value={values}
             weekStartsOn={1}
-            preventDeselect
-
-
     />
 </div>

@@ -2,4 +2,4 @@
     import RangePicker from "$lib/components/RangePicker.svelte";
 </script>
 
-<RangePicker/>
+<RangePicker />
