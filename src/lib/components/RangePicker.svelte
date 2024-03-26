@@ -3,7 +3,7 @@
     import {Calendar} from "$lib/components/ui/calendar";
     import dayjs, {Dayjs} from "dayjs";
     import _ from "lodash";
-    import {dayjsToCalendar} from "../../dateutils";
+    import {dayjsToCalendar} from "../../utils/dateutils";
 
     export let values: DateValue[] = []
     export let datesToDisable: Dayjs[] = [];
@@ -36,6 +36,7 @@
     }
 
     const onPlaceholderChange = (dv: DateValue) => {
+        console.log('child',dv)
         if (dv.month !== selectedMonth.month) {
             values = []
         }

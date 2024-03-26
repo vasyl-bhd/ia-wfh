@@ -6,7 +6,7 @@
     import {Button} from "$lib/components/ui/button";
     import {getLocalTimeZone, today} from "@internationalized/date";
     import {getAttendance, getHolidays} from "./api";
-    import {getPageData} from "./PageDataFetcher";
+    import {getPageData} from "./utils/PageDataFetcher";
 
     const pattern = "YYYY-MM-DD";
 
@@ -18,7 +18,7 @@
     let weekdays: Dayjs[] = []
     let currentPageInfo: { userId: number, sessionid: string, csrftoken: string };
 
-    let selectedMonth = today(getLocalTimeZone())
+    $: selectedMonth = today(getLocalTimeZone())
     $: datesToDisable = []
     $: selectedMonth && getAsyncInfo()
     $: startOfMonth = dayjs(selectedMonth.toDate(getLocalTimeZone())).startOf('month').format(pattern)
@@ -61,6 +61,7 @@
             ...(skipHolidays ? holidays : []),
             ...(skipWeekend ? weekdays : [])
         ]
+
     }
 
 </script>
