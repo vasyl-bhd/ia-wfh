@@ -1,33 +1,49 @@
 <script lang="ts">
-    import RangePicker from "$lib/components/RangePicker.svelte";
     import dayjs, {type Dayjs} from "dayjs";
     import {Checkbox} from "$lib/components/ui/checkbox";
     import {Label} from "$lib/components/ui/label";
     import {Button} from "$lib/components/ui/button";
-    import {getLocalTimeZone, today} from "@internationalized/date";
+    import {type DateValue, getLocalTimeZone, today} from "@internationalized/date";
     import {getAttendance, getHolidays} from "./api";
     import {getPageData} from "./utils/PageDataFetcher";
+    import RangePicker from "$lib/components/RangePicker.svelte";
+    import {values} from "lodash";
 
     const pattern = "YYYY-MM-DD";
 
-
-    let skipHolidays = true
-    let skipWeekend = true
     let attendances: Dayjs[] = []
     let holidays: Dayjs[] = []
     let weekdays: Dayjs[] = []
     let currentPageInfo: { userId: number, sessionid: string, csrftoken: string };
+    let wfhDates: DateValue[];
+
+    let skipHolidays = true
+    let skipWeekend = true
+
+    let startOfMonth: string;
+    let endOfMonth: string;
 
     $: selectedMonth = today(getLocalTimeZone())
-    $: datesToDisable = []
-    $: selectedMonth && getAsyncInfo()
-    $: startOfMonth = dayjs(selectedMonth.toDate(getLocalTimeZone())).startOf('month').format(pattern)
-    $: endOfMonth = dayjs(selectedMonth.toDate(getLocalTimeZone())).endOf('month').format(pattern)
+    $: datesToDisable = [] as Dayjs[]
+
+    $: {
+        datesToDisable = [
+            ...attendances,
+            ...(skipHolidays ? holidays : []),
+            ...(skipWeekend ? weekdays.filter(d => d.day() === 0 || d.day() === 6) : [])
+        ]
+    }
+
+    $: {
+        startOfMonth = dayjs(selectedMonth.toDate(getLocalTimeZone())).startOf('month').format(pattern)
+        endOfMonth = dayjs(selectedMonth.toDate(getLocalTimeZone())).endOf('month').format(pattern)
+        fetchPageInfo().then(() => updateDatesToDisable())
+    }
 
     const fetchHolidays = async () => {
         const holidayResponses = await getHolidays(currentPageInfo.csrftoken, currentPageInfo.sessionid, startOfMonth, endOfMonth)
         const allHolidays = holidayResponses.map(a => dayjs(a.date, pattern))
-        const mappedHolodays = allHolidays.reduce((acc, item) => {
+        const mappedHolidays = allHolidays.reduce((acc, item) => {
             if ([0, 6].includes(item.day())) {
                 acc['weekday'] = [...acc['weekday'], item]
             } else {
@@ -36,8 +52,8 @@
             return acc;
         }, {weekday: [], holiday: []} as Record<'weekday' | 'holiday', Dayjs[]>)
 
-        holidays = mappedHolodays['holiday']
-        weekdays = mappedHolodays['weekday']
+        holidays = mappedHolidays['holiday']
+        weekdays = mappedHolidays['weekday']
     }
 
     const fetchAttendances = async () => {
@@ -45,23 +61,24 @@
         attendances = attendanceResponses.map(a => dayjs(a.date, pattern))
     }
 
-    const getAsyncInfo = async () => {
+    const fetchPageInfo = async () => {
         try {
-            const pageInfo = await getPageData()
-            currentPageInfo = pageInfo
+            if (!currentPageInfo) {
+                currentPageInfo = await getPageData()
+            }
 
-            await fetchHolidays()
-            await fetchAttendances()
+            await Promise.all([fetchHolidays(), fetchAttendances()]);
         } catch (e) {
             console.error(e)
         }
+    }
 
+    function updateDatesToDisable() {
         datesToDisable = [
             ...attendances,
             ...(skipHolidays ? holidays : []),
-            ...(skipWeekend ? weekdays : [])
+            ...(skipWeekend ? weekdays.filter(d => d.day() === 0 || d.day() === 6) : [])
         ]
-
     }
 
 </script>
@@ -69,10 +86,10 @@
 <div class="min-w-96">
     <div class="flex flex-col mx-5 items-stretch">
         <RangePicker
-                bind:selectedMonth
-                bind:datesToDisable
+                datesToDisable={datesToDisable}
+                bind:selectedMonth={selectedMonth}
+                bind:values={wfhDates}
         />
-
         <div>
             <Label for="skip-weekend">Ignore weekends</Label>
             <Checkbox id="skip-weekend" bind:checked={skipWeekend}/>
@@ -84,7 +101,7 @@
         </div>
 
         <div class="my-5">
-            <Button class="w-full" on:click={getAsyncInfo}>Save</Button>
+            <Button class="w-full" on:click={() => {console.log(wfhDates)}}>Save</Button>
         </div>
     </div>
 </div>
