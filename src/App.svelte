@@ -7,6 +7,7 @@
     import {getAttendance, getHolidays} from "./api";
     import {getPageData} from "./utils/PageDataFetcher";
     import RangePicker from "$lib/components/RangePicker.svelte";
+    import {groupDates} from "./utils/dateutils";
 
     const pattern = "YYYY-MM-DD";
 
@@ -100,7 +101,7 @@
         </div>
 
         <div class="my-5">
-            <Button class="w-full" on:click={() => {console.log(wfhDates)}}>Save</Button>
+            <Button class="w-full" on:click={() => {console.log(wfhDates, groupDates(wfhDates, datesToDisable))}}>Save</Button>
         </div>
     </div>
 </div>
