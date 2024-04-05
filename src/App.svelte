@@ -7,7 +7,6 @@
     import {getAttendance, getHolidays} from "./api";
     import {getPageData} from "./utils/PageDataFetcher";
     import RangePicker from "$lib/components/RangePicker.svelte";
-    import {values} from "lodash";
 
     const pattern = "YYYY-MM-DD";
 

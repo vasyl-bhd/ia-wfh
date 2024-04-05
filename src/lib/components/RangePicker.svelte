@@ -8,7 +8,14 @@
     export let values: DateValue[] = []
     export let datesToDisable: Dayjs[];
     export let selectedMonth: DateValue;
-    
+
+    $: {
+        const dayJsDisabledVals = datesToDisable.map(d => dayjsToCalendar(d))
+        values = _.differenceWith(values, dayJsDisabledVals, (c1, c2) =>
+            c1.compare(c2) === 0
+        )
+    }
+
     const fillSortedDates = (sortedDates: [DateValue, DateValue]) => {
         const firstDate = dayjs(sortedDates[0].toDate(getLocalTimeZone()))
         const lastDate = dayjs(sortedDates[1].toDate(getLocalTimeZone()))
