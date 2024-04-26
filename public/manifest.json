@@ -8,12 +8,17 @@
     "default_icon": "vite.svg",
     "default_popup": "index.html"
   },
+  "background": {
+    "service_worker": "background.js"
+  },
   "permissions": [
     "activeTab",
     "cookies",
-    "scripting"
+    "scripting",
+    "webRequest",
+    "declarativeNetRequestWithHostAccess"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "https://central.intelliarts.com/*"
   ]
 }

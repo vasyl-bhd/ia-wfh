@@ -4,10 +4,11 @@
     import {Label} from "$lib/components/ui/label";
     import {Button} from "$lib/components/ui/button";
     import {type DateValue, getLocalTimeZone, today} from "@internationalized/date";
-    import {getAttendance, getHolidays} from "./api";
+    import {getAttendance, getHolidays, saveAttendance} from "./api";
     import {getPageData} from "./utils/PageDataFetcher";
     import RangePicker from "$lib/components/RangePicker.svelte";
     import {groupDates} from "./utils/dateutils";
+    import type {WFHLeaveReq} from "./types";
 
     const pattern = "YYYY-MM-DD";
 
@@ -81,6 +82,26 @@
         ]
     }
 
+    function scheduleWFH(): void {
+        const groupedDates = groupDates(wfhDates)
+
+        const formattedAndGroupedDates = groupedDates.map(d => d.map(v => v.format("YYYY-MM-DD")))
+
+        const allRequests = formattedAndGroupedDates.map(d => ({
+            user: currentPageInfo.userId,
+            id: null,
+            comment: "",
+            is_approved: null,
+            type: 2,
+            timezone: "Europe/Helsinki",
+            start_date: d[0],
+            end_date: d[d.length - 1]
+        } as WFHLeaveReq)).map(payload => saveAttendance(currentPageInfo.csrftoken, currentPageInfo.sessionid, payload))
+
+        Promise.allSettled(allRequests).then(() => chrome.tabs.reload())
+
+    }
+
 </script>
 
 <div class="min-w-96">
@@ -101,7 +122,7 @@
         </div>
 
         <div class="my-5">
-            <Button class="w-full" on:click={() => {console.log(wfhDates, groupDates(wfhDates, datesToDisable))}}>Save</Button>
+            <Button class="w-full" on:click={() => scheduleWFH()}>Save</Button>
         </div>
     </div>
 </div>

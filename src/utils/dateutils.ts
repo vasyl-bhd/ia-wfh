@@ -5,7 +5,6 @@ export const dayjsToCalendar: (d: Dayjs) => DateValue = (d: Dayjs) => new Calend
 
 const calendarToDayjs: (d: DateValue) => Dayjs = (d: DateValue) => dayjs(d.toDate(getLocalTimeZone()))
 
-
 export const groupDates = (d: DateValue[]): Dayjs[][] => {
     return d.map(calendarToDayjs).reduce((acc, current, index, array) => {
         // Start a new group with the current date if this is the first date or if it's not consecutive

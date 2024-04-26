@@ -1,3 +1,5 @@
+import type {WFHLeaveReq} from "./types";
+
 type AttendanceResponse = {
     id: number | null,
     type: number,
@@ -66,4 +68,21 @@ export const getAttendance = (csrfToken: string,
             "cookie": `csrftoken=${csrfToken}; sessionid=${sessionid}`,
         }
     }).then(res => res.json());
+}
+
+export const saveAttendance = (csrfToken: string, sessionid: string, leaveReq: WFHLeaveReq) => {
+    return fetch("https://central.intelliarts.com/rest/leaves/", {
+        headers: {
+            "content-type": "application/json",
+            "x-csrftoken": csrfToken,
+            "x-requested-with": "XMLHttpRequest",
+            "cookie": `csrftoken=${csrfToken}; sessionid=${sessionid}`,
+            referer: "https://central.intelliarts.com/attendance/user/",
+        },
+        referrerPolicy: "strict-origin-when-cross-origin",
+        body: JSON.stringify(leaveReq),
+        method: "POST",
+        mode: "cors",
+        credentials: "include"
+    });
 }
