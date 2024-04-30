@@ -2,13 +2,13 @@
     import dayjs, {type Dayjs} from "dayjs";
     import {Checkbox} from "$lib/components/ui/checkbox";
     import {Label} from "$lib/components/ui/label";
-    import {Button} from "$lib/components/ui/button";
     import {type DateValue, getLocalTimeZone, today} from "@internationalized/date";
     import {getAttendance, getHolidays, saveAttendance} from "./api";
     import {getPageData} from "./utils/PageDataFetcher";
     import RangePicker from "$lib/components/RangePicker.svelte";
     import {groupDates} from "./utils/dateutils";
     import type {WFHLeaveReq} from "./types";
+    import LoadingButton from "$lib/components/ui/LoadingButton.svelte";
 
     const pattern = "YYYY-MM-DD";
 
@@ -23,6 +23,8 @@
 
     let startOfMonth: string;
     let endOfMonth: string;
+
+    let isSaving: boolean = false;
 
     $: selectedMonth = today(getLocalTimeZone())
     $: datesToDisable = [] as Dayjs[]
@@ -83,6 +85,7 @@
     }
 
     function scheduleWFH(): void {
+        isSaving = true;
         const groupedDates = groupDates(wfhDates)
 
         const formattedAndGroupedDates = groupedDates.map(d => d.map(v => v.format("YYYY-MM-DD")))
@@ -98,7 +101,7 @@
             end_date: d[d.length - 1]
         } as WFHLeaveReq)).map(payload => saveAttendance(currentPageInfo.csrftoken, currentPageInfo.sessionid, payload))
 
-        Promise.allSettled(allRequests).then(() => chrome.tabs.reload())
+        Promise.allSettled(allRequests).then(() => chrome.tabs.reload()).finally(() => isSaving = false)
 
     }
 
@@ -122,7 +125,9 @@
         </div>
 
         <div class="my-5">
-            <Button class="w-full" on:click={() => scheduleWFH()}>Save</Button>
+            <LoadingButton
+                    isLoading={isSaving}
+                    onClick={() => scheduleWFH()}>Save</LoadingButton>
         </div>
     </div>
 </div>
